@@ -250,6 +250,34 @@ TZ=Asia/Shanghai
 
 ---
 
+## 自动构建与镜像发布
+
+本仓库包含 GitHub Actions 工作流，会在推送到 `main` 分支或创建 tag（如 `v1.0.1`）时自动构建并推送镜像到 Docker Hub 和 GitHub Container Registry (GHCR)。
+
+步骤：
+
+1. 在 Docker Hub 创建仓库（例如 `suyijun8182/easysub`）。
+2. 在 Docker Hub 创建 access token：登录 https://hub.docker.com → Account Settings → Security → New Access Token，复制 token（只显示一次）。
+3. 在 GitHub 仓库设置中添加 Secrets（Settings → Secrets and variables → Actions）：
+   - `DOCKERHUB_USERNAME`：你的 Docker Hub 用户名
+   - `DOCKERHUB_TOKEN`：上一步生成的 access token
+4. （可选）GHCR：Actions 会使用 `GITHUB_TOKEN` 自动推送到 `ghcr.io/${{ github.repository_owner }}/easysub`，通常无需额外 secret，但请确保仓库 Actions 权限允许写入 Packages（Settings → Actions → General）。
+5. 触发构建：在本地创建并推送 tag，或在 GitHub Actions 页面手动运行工作流。
+
+示例：在本地创建并推送 tag 会触发构建并把镜像推到两个仓库：
+
+```bash
+git tag -a v1.0.1 -m "Release v1.0.1"
+git push origin v1.0.1
+```
+
+构建完成后将生成：
+- `suyijun8182/easysub:v1.0.1` 和 `suyijun8182/easysub:latest`（Docker Hub）
+- `ghcr.io/<your-org-or-username>/easysub:v1.0.1` 和 `ghcr.io/<your-org-or-username>/easysub:latest`（GHCR）
+
+若需我替你把镜像直接推到 Docker Hub，我也可以在本地构建并推送（需要你提供 Docker Hub token，或在本地先执行 `docker login`）。
+
+
 ## 常见问题（FAQ）
 
 **Q: 数据库连接失败？**

@@ -1,0 +1,41 @@
+# ============================================================
+# 飞牛 fnOS 图形界面专用：不需要构建，只拉官方镜像，只跑“应用”一个容器
+#   - 不自带数据库：连接你【已有的 MySQL】，在网页「安装向导」里填地址
+#   - 前端已在本机用 Node 编译好（frontend/dist），容器直接挂载
+#   - 后端用官方 python 镜像，启动时自动装依赖并运行
+#
+# 在 fnOS「Docker → 项目/Compose」中导入本文件即可（详见 飞牛fnOS图形界面部署.md）
+# 访问： http://<NAS-IP>:8842  → 安装向导里填你现有 MySQL 的 主机/端口/用户/密码/库名
+# ============================================================
+services:
+  app:
+    image: python:3.12-slim
+    container_name: baohao-app
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      JWT_SECRET: please-change-this-random-secret
+      TZ: Asia/Shanghai
+      TELEGRAM_BOT_TOKEN: ""
+      EXCHANGE_API_BASE: USD
+      EXCHANGE_API_URL: https://open.er-api.com/v6/latest/
+      REMINDER_SCAN_TIME: "09:00"
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123
+      ADMIN_EMAIL: admin@example.com
+      # 国内加速 pip（如不需要可删）
+      PIP_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
+    volumes:
+      - ./backend:/app                       # 后端源码
+      - ./frontend/dist:/app/frontend_dist   # 已编译好的前端
+      - ./data:/app/data                     # 数据库连接配置 + 上传图标
+      - baohao_venv:/venv                    # Python 依赖（持久化，重启不必重装）
+    command: >
+      sh -c "test -d /venv/bin || python -m venv /venv &&
+             /venv/bin/pip install -r requirements.txt &&
+             /venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8842:8000"             # 左边是 NAS 对外端口，可自行修改
+
+volumes:
+  baohao_venv:

@@ -89,6 +89,14 @@ const zh = {
     replaceConfirm: '将先删除你当前的全部订阅，再从备份导入。确定继续？',
     exportOk: '备份已下载', importOk: '已成功导入 {n} 个订阅', importFail: '导入失败：文件格式不正确'
   },
+  backupAll: {
+    title: '整站备份与恢复（管理员）',
+    tip: '导出全部成员的账户与数据为一个 JSON 文件；重新部署后导入即可整站恢复所有用户的订阅、分类等。',
+    export: '导出整站备份', import: '导入整站恢复', replace: '每个用户导入前清空其现有订阅',
+    importConfirm: '将从整站备份恢复全部成员数据（缺失的账户会自动重建）。确定继续？',
+    replaceConfirm: '将先清空每个用户的全部订阅，再从整站备份导入。确定继续？',
+    exportOk: '整站备份已下载（{n} 个用户）', importOk: '已恢复 {users} 个用户（新建 {created} 个），共导入 {n} 个订阅'
+  },
   common: { loading: '加载中...', save: '保存', actions: '操作', status: '状态', date: '日期', confirm: '确认', cancel: '取消', close: '关闭' }
 }
 
@@ -181,6 +189,14 @@ const en = {
     replaceConfirm: 'This will delete all your current subscriptions before importing. Continue?',
     exportOk: 'Backup downloaded', importOk: 'Imported {n} subscriptions', importFail: 'Import failed: invalid file'
   },
+  backupAll: {
+    title: 'Full Site Backup & Restore (Admin)',
+    tip: 'Export every member\'s account and data as one JSON file. After a redeploy, import it to restore all users\' subscriptions, categories and more.',
+    export: 'Export full backup', import: 'Import full backup', replace: 'Clear each user\'s subscriptions first',
+    importConfirm: 'This restores all members\' data from a full-site backup (missing accounts are recreated). Continue?',
+    replaceConfirm: 'This clears every user\'s subscriptions before importing from the full backup. Continue?',
+    exportOk: 'Full backup downloaded ({n} users)', importOk: 'Restored {users} users ({created} created), imported {n} subscriptions'
+  },
   common: { loading: 'Loading...', save: 'Save', actions: 'Actions', status: 'Status', date: 'Date', confirm: 'Confirm', cancel: 'Cancel', close: 'Close' }
 }
 
@@ -272,6 +288,14 @@ const ru = {
     export: 'Экспорт', import: 'Импорт', replace: 'Сначала очистить подписки',
     replaceConfirm: 'Все текущие подписки будут удалены перед импортом. Продолжить?',
     exportOk: 'Файл скачан', importOk: 'Импортировано подписок: {n}', importFail: 'Ошибка импорта: неверный файл'
+  },
+  backupAll: {
+    title: 'Полная резервная копия сайта (админ)',
+    tip: 'Экспортируйте аккаунты и данные всех участников в один JSON-файл. После переустановки импортируйте его, чтобы восстановить подписки, категории и т.д. всех пользователей.',
+    export: 'Экспорт полной копии', import: 'Импорт полной копии', replace: 'Сначала очистить подписки каждого пользователя',
+    importConfirm: 'Будут восстановлены данные всех участников из полной копии (отсутствующие аккаунты создаются заново). Продолжить?',
+    replaceConfirm: 'Подписки каждого пользователя будут удалены перед импортом из полной копии. Продолжить?',
+    exportOk: 'Полная копия скачана (пользователей: {n})', importOk: 'Восстановлено пользователей: {users} (создано: {created}), импортировано подписок: {n}'
   },
   common: { loading: 'Загрузка...', save: 'Сохранить', actions: 'Действия', status: 'Статус', date: 'Дата', confirm: 'Подтвердить', cancel: 'Отмена', close: 'Закрыть' }
 }

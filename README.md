@@ -7,6 +7,10 @@
 
 自托管的订阅 / 续费 / 保号管理系统，通过 **Telegram** 提醒你及时续费保号，防止忘记导致项目过期。
 
+```bash
+docker run -d -p 8842:8000 -v easysub_data:/app/data suyijun8182/easysub:latest
+```
+
 [🚀 快速开始](#快速开始) • [📖 文档](#文档) • [💡 功能](#功能特性) • [🤝 贡献](#贡献) • [📝 许可](#许可)
 
 </div>
@@ -52,31 +56,48 @@ https://easysub.vviip.dpdns.org:8443/
 - Docker & Docker Compose（推荐）或 Python 3.11+ / Node.js 18+
 - 已有的 MySQL 8 实例 + 一个空数据库
 
-### Docker 一键部署（推荐）
+### 方式 A：拉取已发布镜像（最简单，推荐）
+
+镜像已发布到 Docker Hub 和 GHCR，**无需源码、无需构建**：
+
+```bash
+# Docker Hub（国内慢可换 ghcr.io/suyijun8182/easysub:latest）
+docker run -d --name easysub \
+  -p 8842:8000 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
+  -e ADMIN_EMAIL=admin@example.com -e TZ=Asia/Shanghai \
+  -v easysub_data:/app/data \
+  --restart unless-stopped \
+  suyijun8182/easysub:latest
+```
+
+或用仓库内的 compose 文件：
+
+```bash
+docker compose -f docker-compose.hub.yml up -d
+```
+
+启动后访问 `http://服务器IP:8842` → 进入「数据库安装向导」→ 填入你的 MySQL 连接 → 测试 → 「保存并初始化」。
+
+### 方式 B：从源码构建（含 Caddy 自动 HTTPS）
 
 ```bash
 # 1. 克隆项目
-git clone https://github.com/你的用户名/easysub.git
+git clone https://github.com/suyijun8182/easysub.git
 cd easysub
 
 # 2. 准备配置文件
 cp .env.example .env
-# 编辑 .env，改以下内容：
-#   - JWT_SECRET: 用 `openssl rand -hex 32` 生成
-#   - ADMIN_USERNAME/ADMIN_PASSWORD: 管理员账号密码
-#   - TELEGRAM_BOT_TOKEN: 可先留空，后续在网页设置
+# 编辑 .env：JWT_SECRET（openssl rand -hex 32 生成）、ADMIN_USERNAME/ADMIN_PASSWORD 等
 
 # 3. 配置域名（可选，本地测试可跳过）
 vi Caddyfile  # 把 your-domain.com 改成你的域名
 
-# 4. 启动服务
+# 4. 启动服务（构建镜像 + Caddy）
 docker compose up -d --build
 
-# 5. 首次访问
-#    访问 http://服务器IP  或  https://你的域名
-#    会进入「数据库安装向导」
-#    填入你的 MySQL 连接信息并测试连接
-#    点「保存并初始化」自动建表和创建管理员
+# 5. 访问 http://服务器IP 或 https://你的域名，按向导配置数据库
 ```
 
 ### 本地开发部署
@@ -102,7 +123,8 @@ npm run dev  # http://localhost:5173
 
 ### NAS 用户部署
 
-如果你使用 TrueNAS / 飞牛 fnOS / 群晖 / 威联通 / Unraid，详见 [安装部署文档](./安装部署文档.md)
+群晖 Synology / 威联通 QNAP / 飞牛 fnOS / Unraid / TrueNAS 的图形界面安装步骤，
+详见 **[各厂家 NAS 安装教程](./各厂家NAS安装教程.md)**（已改为直接拉取发布镜像，无需构建）。
 
 ---
 
@@ -111,6 +133,8 @@ npm run dev  # http://localhost:5173
 | 文档 | 说明 |
 |------|------|
 | [README.md](./README.md) | 项目概览（本文件） |
+| [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) | 群晖/威联通/飞牛/Unraid/TrueNAS 图形界面安装（拉取发布镜像） |
+| [DOCKERHUB.md](./DOCKERHUB.md) | Docker Hub 仓库说明（可直接粘贴到 Docker Hub Overview） |
 | [安装部署文档.md](./安装部署文档.md) | NAS 和 Docker 详细部署 |
 | [技术方案.md](./技术方案.md) | 项目架构和技术选型 |
 | [升级与GitHub指南.md](./升级与GitHub指南.md) | 版本升级和同步到个人 GitHub 仓库 |
@@ -307,8 +331,8 @@ git push origin v1.0.1
 - DNS 需解析到服务器
 
 **Q: 可以导入/导出订阅吗？**
-- 目前支持通过 API
-- 计划在未来版本中添加 UI
+- 可以。**设置 → 数据备份** 里支持导出/导入 JSON 备份。
+- 管理员还可在同处使用 **整站备份/恢复**，一次性备份并还原全部成员的账户与数据。
 
 ---
 
@@ -380,20 +404,19 @@ A self-hosted subscription management system that sends **Telegram** reminders t
 ### Quick Start
 
 ```bash
-# Clone
-git clone <repo-url>
-cd easysub
+# Pull the published image — no build needed
+docker run -d --name easysub -p 8842:8000 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
+  -v easysub_data:/app/data --restart unless-stopped \
+  suyijun8182/easysub:latest
 
-# Copy config
-cp .env.example .env
-
-# Start
-docker compose up -d --build
-
-# Access at http://localhost
+# Open http://<host>:8842 and finish the DB wizard (connect your MySQL 8)
 ```
 
-For full English documentation, see [安装部署文档.md](./安装部署文档.md)
+Or build from source: `git clone https://github.com/suyijun8182/easysub.git && cd easysub && cp .env.example .env && docker compose up -d --build`
+
+NAS guides (Synology/QNAP/fnOS/Unraid/TrueNAS): see [各厂家NAS安装教程.md](./各厂家NAS安装教程.md). Docker Hub: [suyijun8182/easysub](https://hub.docker.com/r/suyijun8182/easysub).
 
 ---
 
@@ -414,10 +437,13 @@ For full English documentation, see [安装部署文档.md](./安装部署文档
 ### Быстрый старт
 
 ```bash
-git clone <repo-url>
-cd easysub
-cp .env.example .env
-docker compose up -d --build
+# Готовый образ — сборка не нужна
+docker run -d --name easysub -p 8842:8000 \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
+  -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
+  -v easysub_data:/app/data --restart unless-stopped \
+  suyijun8182/easysub:latest
 ```
 
-Полная документация доступна в [安装部署文档.md](./安装部署文档.md)
+Откройте `http://<host>:8842` и завершите мастер настройки БД (подключите ваш MySQL 8).
+Инструкции для NAS: [各厂家NAS安装教程.md](./各厂家NAS安装教程.md). Docker Hub: [suyijun8182/easysub](https://hub.docker.com/r/suyijun8182/easysub).

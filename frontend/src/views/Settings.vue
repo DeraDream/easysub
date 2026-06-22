@@ -122,6 +122,20 @@
       <p v-if="backupMsg" :class="backupOk ? 'ok' : 'err'">{{ backupMsg }}</p>
     </div>
 
+    <!-- 管理员：整站备份与恢复 -->
+    <div class="card sect" v-if="auth.user?.is_admin">
+      <h3>🗄️ {{ t('backupAll.title') }}</h3>
+      <p class="muted" style="font-size:13px;margin-top:0">{{ t('backupAll.tip') }}</p>
+      <div class="row" style="align-items:center;gap:12px">
+        <button class="btn ghost" @click="exportAll">⬇️ {{ t('backupAll.export') }}</button>
+        <label class="btn ghost" style="width:auto;margin:0">⬆️ {{ t('backupAll.import') }}
+          <input type="file" accept="application/json,.json" hidden @change="importAll" />
+        </label>
+        <label class="switch"><input type="checkbox" v-model="importAllReplace" /> <span>{{ t('backupAll.replace') }}</span></label>
+      </div>
+      <p v-if="backupAllMsg" :class="backupAllOk ? 'ok' : 'err'">{{ backupAllMsg }}</p>
+    </div>
+
     <!-- 系统信息 -->
     <div class="card sect">
       <h3>ℹ️ {{ t('sys.title') }}</h3>
@@ -183,6 +197,10 @@ const backupMsg = ref('')
 const backupOk = ref(false)
 const importReplace = ref(false)
 
+const backupAllMsg = ref('')
+const backupAllOk = ref(false)
+const importAllReplace = ref(false)
+
 async function exportData() {
   backupMsg.value = ''
   try {
@@ -221,6 +239,49 @@ async function importData(e) {
   } catch (err) {
     backupOk.value = false
     backupMsg.value = err.response?.data?.detail || t('backup.importFail')
+  } finally {
+    e.target.value = ''
+  }
+}
+
+async function exportAll() {
+  backupAllMsg.value = ''
+  try {
+    const { data } = await api.get('/api/backup/export-all')
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    const stamp = new Date().toISOString().slice(0, 10)
+    a.href = url
+    a.download = `easysub-full-backup-${stamp}.json`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
+    backupAllOk.value = true
+    backupAllMsg.value = t('backupAll.exportOk', { n: data.users?.length || 0 })
+  } catch (e) {
+    backupAllOk.value = false
+    backupAllMsg.value = e.response?.data?.detail || 'Error'
+  }
+}
+
+async function importAll(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  backupAllMsg.value = ''
+  if (!window.confirm(t(importAllReplace.value ? 'backupAll.replaceConfirm' : 'backupAll.importConfirm'))) {
+    e.target.value = ''
+    return
+  }
+  try {
+    const json = JSON.parse(await file.text())
+    const { data } = await api.post('/api/backup/import-all', { data: json, replace: importAllReplace.value })
+    backupAllOk.value = true
+    backupAllMsg.value = t('backupAll.importOk', { users: data.users, created: data.created_users, n: data.imported })
+  } catch (err) {
+    backupAllOk.value = false
+    backupAllMsg.value = err.response?.data?.detail || t('backup.importFail')
   } finally {
     e.target.value = ''
   }

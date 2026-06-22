@@ -135,9 +135,7 @@ npm run dev  # http://localhost:5173
 | [README.md](./README.md) | 项目概览（本文件） |
 | [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) | 群晖/威联通/飞牛/Unraid/TrueNAS 图形界面安装（拉取发布镜像） |
 | [DOCKERHUB.md](./DOCKERHUB.md) | Docker Hub 仓库说明（可直接粘贴到 Docker Hub Overview） |
-| [安装部署文档.md](./安装部署文档.md) | NAS 和 Docker 详细部署 |
 | [技术方案.md](./技术方案.md) | 项目架构和技术选型 |
-| [升级与GitHub指南.md](./升级与GitHub指南.md) | 版本升级和同步到个人 GitHub 仓库 |
 
 ---
 
@@ -241,7 +239,7 @@ easysub/
 │   └── vite.config.js
 ├── Dockerfile                   多阶段构建
 ├── docker-compose.yml           生产配置
-├── docker-compose.fnos.yml      NAS 简化配置
+├── docker-compose.hub.yml       拉取发布镜像一键部署
 ├── Caddyfile                    反向代理配置
 ├── .env.example                 环境变量示例
 └── README.md                    本文件

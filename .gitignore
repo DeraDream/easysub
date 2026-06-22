@@ -1,0 +1,79 @@
+# Python
+node_modules/
+dist/
+frontend_dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Backend
+backend/data/
+data/
+.env
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+debug-logs/
+
+# Temp files
+*.tmp
+.cache/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Frontend
+node_modules/
+dist/
+.nuxt/
+.cache
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Docker
+.dockerignore
+
+# Git
+.git/
+
+# 内部开发/发布笔记与已被取代的旧文档（仅本地保留，不发布到仓库）
+需要实现的功能.txt
+技术方案.txt
+GITHUB发布完成清单.md
+GITHUB发布指南.md
+升级与GitHub指南.md
+安装部署文档.md
+飞牛fnOS图形界面部署.md
+飞牛fnOS部署指南.md
+docker-compose.fnos.yml
+docker-compose.gui.yml
+docker-compose.panel.yml
+update-dockerhub-overview.sh

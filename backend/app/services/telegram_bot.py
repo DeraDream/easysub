@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 import re
+import time
 
 from sqlalchemy import select
 
@@ -13,6 +14,7 @@ from app.services import exchange, telegram
 
 _offsets: dict[tuple[str, str, str], int] = {}
 _RENEW_RE = re.compile(r"^续费\s*(\d+)$")
+_STARTED_AT = int(time.time())
 
 
 def _escape_md(text: str) -> str:
@@ -61,11 +63,26 @@ def run_bot_poll() -> None:
                 continue
 
             next_offset = max(int(u.get("update_id", 0)) for u in updates) + 1
+            first_poll = key not in _offsets
             if key not in _offsets:
-                # 首次启动时只记录 offset，避免处理历史消息。
+                # 首次启动时跳过历史消息，但保留服务启动后刚点的按钮。
                 _offsets[key] = next_offset
-                continue
-            _offsets[key] = next_offset
+                updates = [
+                    u
+                    for u in updates
+                    if int(
+                        (
+                            u.get("message")
+                            or u.get("edited_message")
+                            or {}
+                        ).get("date", 0)
+                    )
+                    >= _STARTED_AT - 5
+                ]
+                if not updates:
+                    continue
+            else:
+                _offsets[key] = next_offset
 
             for update in updates:
                 msg = update.get("message") or update.get("edited_message") or {}
@@ -75,6 +92,8 @@ def run_bot_poll() -> None:
                 user = users_by_chat.get(chat_id)
                 if not user or not text:
                     continue
+                if first_poll:
+                    print(f"[telegram-bot] processing recent message from chat {chat_id}: {text}")
                 _handle_text(db, user, text)
         db.commit()
     except Exception as e:  # noqa: BLE001

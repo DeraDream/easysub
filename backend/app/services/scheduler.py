@@ -194,6 +194,10 @@ def start_scheduler() -> None:
         max_instances=1,
     )
     _scheduler.start()
+    try:
+        telegram_bot.run_bot_poll()
+    except Exception as e:  # noqa: BLE001
+        print(f"[telegram-bot] initial poll failed: {e}")
 
 
 def _refresh_rates_job() -> None:

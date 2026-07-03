@@ -15,10 +15,8 @@
 ## 通用前置条件
 
 1. NAS 已安装 **Docker / Container** 套件。
-2. 一个**可用的 MySQL 8 数据库**和一个空库（本项目不内置数据库，连接你已有的 MySQL）。
-   - 数据库可以在同一台 NAS 上（如群晖的 MariaDB/MySQL 套件），也可以是别的服务器。
-   - ⚠️ 容器内**不能用 `localhost`** 连数据库——要填 NAS 的**局域网 IP**（如 `192.168.1.10`）。
-3. 关键环境变量（创建容器时填）：
+2. 推荐使用本仓库的 `docker-compose.hub.yml` 创建项目；它会同时启动 EasySub 和 MySQL 8，数据库会自动初始化。
+3. 关键环境变量（创建项目/容器时填）：
 
 | 变量 | 说明 | 示例 |
 |------|------|------|
@@ -29,11 +27,13 @@
 | `TZ` | 时区 | `Asia/Shanghai` |
 | `REMINDER_SCAN_TIME` | 每天提醒扫描时间 | `09:00` |
 | `TELEGRAM_BOT_TOKEN` | 可留空，后续网页里配 | |
+| `EASYSUB_DB_PASSWORD` | EasySub 连接内置 MySQL 的密码，建议改强密码 | `change-me-db-password` |
+| `MYSQL_ROOT_PASSWORD` | MySQL root 密码，建议改强密码 | `change-me-root-password` |
 
 - **端口**：容器内部 `8000`，映射到宿主任意端口（本文统一用 `8842`）。
-- **持久化目录**：把容器内 `/app/data` 映射到 NAS 的一个目录（存数据库连接配置 + 上传图标）。
+- **持久化目录**：EasySub 的 `/app/data` 存连接配置和上传图标；MySQL 的 `/var/lib/mysql` 存业务数据，二者都要持久化。
 
-完成创建后，浏览器访问 `http://<NAS局域网IP>:8842` → 进入**安装向导**填 MySQL 连接 → 测试 → 保存并初始化 → 用上面的管理员账号登录。
+完成创建后，浏览器访问 `http://<NAS局域网IP>:8842`，用上面的管理员账号登录即可。若未配置 `EASYSUB_DB_*` 环境变量，才会进入安装向导。
 
 ---
 
@@ -152,9 +152,11 @@ NAS 图形界面：在镜像里重新拉取 `latest`，再重建容器（保持 
 ## 常见问题
 
 **Q：向导测试数据库连接失败？**
+- 使用推荐 compose 部署时通常不会出现安装向导；如果出现，先确认 `db` 容器健康、`EASYSUB_DB_*` 环境变量存在且密码一致。
 - host 不要填 `localhost`，要填 MySQL 的局域网 IP。
 - MySQL 账号需允许从容器网段远程连接：
-  `CREATE USER 'easysub'@'%' IDENTIFIED BY '密码'; GRANT ALL ON 库名.* TO 'easysub'@'%'; FLUSH PRIVILEGES;`
+  `CREATE USER 'easysub'@'%' IDENTIFIED BY '密码'; GRANT ALL PRIVILEGES ON easysub.* TO 'easysub'@'%'; FLUSH PRIVILEGES;`
+  这里的 `easysub` 是安装向导里填写的目标数据库名，数据库可以尚未存在，EasySub 会在初始化时创建。
 - 确认 MySQL 的 `bind-address` 不是只绑 `127.0.0.1`，端口对局域网开放。
 
 **Q：端口被占用？**

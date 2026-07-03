@@ -3,10 +3,10 @@ import { createI18n } from 'vue-i18n'
 const zh = {
   app: { title: '省心订阅 EasySub', tagline: '订阅 / 续费 / 保号，一个都不漏' },
   setup: {
-    title: '数据库安装向导', subtitle: '首次使用，请配置 MySQL 数据库连接',
+    title: '数据库安装向导', subtitle: '首次使用，请配置 MySQL 服务器连接，EasySub 会自动创建数据库',
     host: '主机地址', port: '端口', user: '用户名', password: '密码', database: '数据库名',
     test: '测试连接', save: '保存并初始化', testing: '测试中...', saving: '初始化中...',
-    testOk: '连接成功', testFail: '连接失败', tip: '提示：若数据库也在 Docker Compose 内，主机填服务名（如 db）；否则填 NAS 局域网 IP。',
+    testOk: '连接成功', testFail: '连接失败', tip: '提示：填写 MySQL 服务器地址和有建库权限的账号；数据库不存在时会在初始化时自动创建。',
     done: '配置完成，正在跳转登录...'
   },
   nav: { dashboard: '仪表盘', subscriptions: '订阅管理', calendar: '日历', reports: '报表分析', notifications: '通知中心', logs: '实时日志', settings: '设置', users: '用户管理', logout: '退出' },
@@ -103,10 +103,10 @@ const zh = {
 const en = {
   app: { title: 'EasySub', tagline: 'Never miss a renewal again' },
   setup: {
-    title: 'Database Setup', subtitle: 'First run — configure your MySQL connection',
+    title: 'Database Setup', subtitle: 'First run — configure your MySQL server; EasySub creates the database automatically',
     host: 'Host', port: 'Port', user: 'User', password: 'Password', database: 'Database',
     test: 'Test connection', save: 'Save & initialize', testing: 'Testing...', saving: 'Initializing...',
-    testOk: 'Connected', testFail: 'Connection failed', tip: 'Tip: if MySQL runs in the same Compose, use the service name (e.g. db) as host; otherwise use the NAS LAN IP.',
+    testOk: 'Connected', testFail: 'Connection failed', tip: 'Tip: enter the MySQL server and an account that can create databases; EasySub will create the database during initialization.',
     done: 'Done, redirecting to login...'
   },
   nav: { dashboard: 'Dashboard', subscriptions: 'Subscriptions', calendar: 'Calendar', reports: 'Reports', notifications: 'Notifications', logs: 'Live Logs', settings: 'Settings', users: 'Users', logout: 'Logout' },
@@ -203,10 +203,10 @@ const en = {
 const ru = {
   app: { title: 'EasySub', tagline: 'Не пропустите ни одного продления' },
   setup: {
-    title: 'Настройка базы данных', subtitle: 'Первый запуск — укажите подключение MySQL',
+    title: 'Настройка базы данных', subtitle: 'Первый запуск — укажите сервер MySQL; EasySub создаст базу автоматически',
     host: 'Хост', port: 'Порт', user: 'Пользователь', password: 'Пароль', database: 'База данных',
     test: 'Проверить', save: 'Сохранить и инициализировать', testing: 'Проверка...', saving: 'Инициализация...',
-    testOk: 'Подключено', testFail: 'Ошибка подключения', tip: 'Подсказка: если MySQL в том же Compose — укажите имя сервиса (например db); иначе IP NAS в локальной сети.',
+    testOk: 'Подключено', testFail: 'Ошибка подключения', tip: 'Укажите сервер MySQL и пользователя с правом создания баз; EasySub создаст базу при инициализации.',
     done: 'Готово, переход ко входу...'
   },
   nav: { dashboard: 'Панель', subscriptions: 'Подписки', calendar: 'Календарь', reports: 'Отчёты', notifications: 'Уведомления', logs: 'Логи', settings: 'Настройки', users: 'Пользователи', logout: 'Выход' },

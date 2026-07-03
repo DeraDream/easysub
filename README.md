@@ -13,7 +13,7 @@
 **中文 | [English](#english) | [Русский](#русский)**
 
 ```bash
-docker run -d -p 8842:8000 -v easysub_data:/app/data suyijun8182/easysub:latest
+docker compose -f docker-compose.hub.yml up -d
 ```
 
 </div>
@@ -38,16 +38,25 @@ docker run -d -p 8842:8000 -v easysub_data:/app/data suyijun8182/easysub:latest
 | 💾 **备份恢复** | 单用户 JSON 备份；管理员可一键**整站备份 / 恢复**全部成员数据 |
 | 🌍 **多语言 / 多主题** | 中文 / English / Русский，5 套主题 |
 | 🖼️ **自定义图标** | Emoji、上传图片或 URL |
-| 🗄️ **接入你的 MySQL** | 不内置数据库，连接你已有的 MySQL 8，网页向导一键初始化 |
+| 🗄️ **数据库自动初始化** | Compose 默认自带 MySQL 8，应用启动时自动建库、建表、初始化数据 |
 
 ---
 
 ## 🚀 快速开始
 
 > 镜像已发布到 **Docker Hub** 与 **GHCR**，无需源码、无需构建。
-> 本项目**不内置数据库**，需准备一个可用的 **MySQL 8** 和一个空库，首次访问由网页向导引导配置。
+> 推荐使用 `docker-compose.hub.yml`，它会同时启动 EasySub 与 MySQL 8，应用会自动初始化数据库。启动后访问 Web，可直接用管理员账号登录。
 
-### 方式 A：拉取镜像运行（推荐）
+### 方式 A：Compose 一键运行（推荐）
+
+```bash
+curl -O https://raw.githubusercontent.com/suyijun8182/easysub/main/docker-compose.hub.yml
+docker compose -f docker-compose.hub.yml up -d
+```
+
+启动后访问 `http://<服务器IP>:8842`，默认管理员账号来自 compose 文件中的 `ADMIN_USERNAME` / `ADMIN_PASSWORD`。正式使用前请修改 `JWT_SECRET`、数据库密码和管理员密码。
+
+### 方式 B：单容器运行（连接外部 MySQL）
 
 ```bash
 docker run -d --name easysub \
@@ -55,22 +64,21 @@ docker run -d --name easysub \
   -e JWT_SECRET="$(openssl rand -hex 32)" \
   -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
   -e ADMIN_EMAIL=admin@example.com -e TZ=Asia/Shanghai \
+  -e EASYSUB_DB_HOST=你的MySQL地址 \
+  -e EASYSUB_DB_PORT=3306 \
+  -e EASYSUB_DB_USER=easysub \
+  -e EASYSUB_DB_PASSWORD=你的数据库密码 \
+  -e EASYSUB_DB_NAME=easysub \
   -v easysub_data:/app/data \
   --restart unless-stopped \
   suyijun8182/easysub:latest
 ```
 
-或使用仓库内的 compose 文件：
-
-```bash
-docker compose -f docker-compose.hub.yml up -d
-```
-
 > 国内拉取慢可改用 GHCR 镜像：`ghcr.io/suyijun8182/easysub:latest`
 
-启动后访问 `http://<服务器IP>:8842` → 进入「数据库安装向导」→ 填入 MySQL 连接 → 测试 → 「保存并初始化」→ 用管理员账号登录。
+若未提供 `EASYSUB_DB_*` 环境变量，首次访问会进入「数据库安装向导」。数据库不存在时 EasySub 会自动创建，然后建表与写入默认数据。
 
-### 方式 B：从源码构建（自带 Caddy 自动 HTTPS）
+### 方式 C：从源码构建（自带 MySQL 与 Caddy 自动 HTTPS）
 
 ```bash
 git clone https://github.com/suyijun8182/easysub.git
@@ -108,16 +116,16 @@ docker compose up -d --build
 |------|------|
 | 后端 | FastAPI · SQLAlchemy · APScheduler |
 | 前端 | Vue 3 · Vite · vue-i18n · Pinia |
-| 数据库 | MySQL 8（网页向导中配置你已有的实例） |
+| 数据库 | MySQL 8（Compose 默认自带；也可通过环境变量或网页向导连接外部实例） |
 | 部署 | Docker（多架构 amd64 / arm64）· Caddy 自动 HTTPS |
 
-数据持久化在**你自己的 MySQL** 中；容器 `/app/data` 仅存数据库连接配置与上传的图标。
+数据持久化在 MySQL 中；容器 `/app/data` 仅存数据库连接配置与上传的图标。使用仓库 Compose 时，MySQL 数据在 `mysql_data` / `easysub_mysql` Docker 卷中。
 
 ---
 
 ## 📖 使用要点
 
-- **第一次登录**：按网页向导填 MySQL 连接（容器内不要用 `localhost`，填实际 IP / 服务名），初始化后用管理员账号登录。
+- **第一次登录**：使用仓库 Compose 时，数据库会自动初始化，直接用管理员账号登录；外部 MySQL 或单容器部署可通过 `EASYSUB_DB_*` 自动初始化，未配置时才进入网页安装向导。
 - **Telegram 提醒**：找 @BotFather `/newbot` 拿 Bot Token → 设置 → Telegram 配置 → 填 Token、验证机器人、获取 Chat ID、发送测试。
 - **续费规则**：点击续费后系统从当前时间重新计算下次到期（保号场景），循环订阅可选择按原到期日累加。
 - **备份**：设置 → 数据备份，导出 / 导入 JSON；管理员可整站备份与恢复全部成员数据。
@@ -134,6 +142,7 @@ docker compose up -d --build
 
 - 容器内不能用 `localhost`，要填 MySQL 的实际 IP / 服务名。
 - 确认账号允许从容器网段远程连接，端口对局域网开放，`bind-address` 不是只绑 `127.0.0.1`。
+- 如果目标数据库尚不存在，安装向导使用的 MySQL 账号需要具备 `CREATE DATABASE` 权限。
 </details>
 
 <details>

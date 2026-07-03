@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    # 基础（数据库连接已改为运行时由网页安装向导配置，不再用环境变量）
+    # 基础（数据库可由环境变量自动初始化；未配置时进入网页安装向导）
     jwt_secret: str = "change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     admin_username: str = "admin"
     admin_password: str = "admin123"
     admin_email: str = "admin@example.com"
+
+    # 可选：Docker/Compose 自动初始化数据库。留空时仍进入网页安装向导。
+    easysub_db_host: str = ""
+    easysub_db_port: int = 3306
+    easysub_db_user: str = ""
+    easysub_db_password: str = ""
+    easysub_db_name: str = "easysub"
 
 
 @lru_cache

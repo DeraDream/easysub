@@ -8,24 +8,17 @@ Self-hosted subscription / renewal manager with **Telegram reminders** so you ne
 - **Tags**: `latest`, `v*` (per release) — multi-arch `linux/amd64` + `linux/arm64`
 - **GHCR mirror**: `ghcr.io/suyijun8182/easysub:latest`
 
-> The image does **not** bundle a database. On first visit a web wizard asks for **your existing MySQL 8** connection.
-> 镜像**不内置数据库**，首次访问网页向导填入你已有的 MySQL 连接即可。
+> Use the compose file for a ready-to-run stack with MySQL 8. EasySub can also auto-initialize an external MySQL server through `EASYSUB_DB_*` environment variables.
+> 推荐使用 compose 文件一键启动 EasySub + MySQL 8。也可通过 `EASYSUB_DB_*` 环境变量自动初始化外部 MySQL。
 
 ## Quick start / 快速开始
 
 ```bash
-docker run -d --name easysub \
-  -p 8842:8000 \
-  -e JWT_SECRET="$(openssl rand -hex 32)" \
-  -e ADMIN_USERNAME=admin \
-  -e ADMIN_PASSWORD=admin123 \
-  -e TZ=Asia/Shanghai \
-  -v easysub_data:/app/data \
-  --restart unless-stopped \
-  suyijun8182/easysub:latest
+curl -O https://raw.githubusercontent.com/suyijun8182/easysub/main/docker-compose.hub.yml
+docker compose -f docker-compose.hub.yml up -d
 ```
 
-Then open `http://<host>:8842`, finish the DB wizard, and log in.
+Then open `http://<host>:8842` and log in with the admin account from the environment variables.
 
 ## docker-compose
 
@@ -41,12 +34,36 @@ services:
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: admin123
       ADMIN_EMAIL: admin@example.com
+      EASYSUB_DB_HOST: db
+      EASYSUB_DB_PORT: 3306
+      EASYSUB_DB_USER: easysub
+      EASYSUB_DB_PASSWORD: please-change-this-db-password
+      EASYSUB_DB_NAME: easysub
     volumes:
       - easysub_data:/app/data
     ports:
       - "8842:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: easysub
+      MYSQL_USER: easysub
+      MYSQL_PASSWORD: please-change-this-db-password
+      MYSQL_ROOT_PASSWORD: please-change-this-root-password
+    volumes:
+      - easysub_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -ueasysub -pplease-change-this-db-password --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 volumes:
   easysub_data:
+  easysub_mysql:
 ```
 
 ## Environment variables / 环境变量
@@ -63,6 +80,7 @@ volumes:
 ## Volumes
 
 - `/app/data` — DB connection config (`db_config.json`) + uploaded icons. Persist this.
+- `/var/lib/mysql` — MySQL data volume when using the compose stack.
 
 ## Features
 

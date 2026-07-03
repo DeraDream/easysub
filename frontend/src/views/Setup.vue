@@ -17,7 +17,7 @@
       <div class="row">
         <div style="flex:1">
           <label>{{ t('setup.user') }}</label>
-          <input v-model="cfg.user" placeholder="baohao" />
+          <input v-model="cfg.user" placeholder="root / easysub" />
         </div>
         <div style="flex:1">
           <label>{{ t('setup.password') }}</label>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <label>{{ t('setup.database') }}</label>
-      <input v-model="cfg.database" placeholder="baohao" />
+      <input v-model="cfg.database" placeholder="easysub" />
 
       <p class="tip">{{ t('setup.tip') }}</p>
 
@@ -55,7 +55,7 @@ import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 
 const { t, locale } = useI18n()
-const cfg = reactive({ host: 'db', port: 3306, user: 'baohao', password: '', database: 'baohao' })
+const cfg = reactive({ host: 'db', port: 3306, user: 'root', password: '', database: 'easysub' })
 const msg = ref('')
 const ok = ref(false)
 const testing = ref(false)

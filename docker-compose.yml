@@ -1,5 +1,5 @@
-# 生产部署：app + Caddy(自动 HTTPS)，连接你【已有的 MySQL】（不自带数据库）
-# 数据库连接在首次访问的网页「安装向导」中填写你现有 MySQL 的地址。
+# 生产部署：app + MySQL + Caddy(自动 HTTPS)
+# 默认通过环境变量自动初始化数据库；首次打开 Web 后可直接登录。
 services:
   app:
     build: .
@@ -9,6 +9,26 @@ services:
       - app_data:/app/data        # 数据库连接配置 + 上传图标持久化
     expose:
       - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${EASYSUB_DB_NAME:-easysub}
+      MYSQL_USER: ${EASYSUB_DB_USER:-easysub}
+      MYSQL_PASSWORD: ${EASYSUB_DB_PASSWORD:-change-me-db-password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me-root-password}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
   caddy:
     image: caddy:2-alpine
@@ -25,5 +45,6 @@ services:
 
 volumes:
   app_data:
+  mysql_data:
   caddy_data:
   caddy_config:

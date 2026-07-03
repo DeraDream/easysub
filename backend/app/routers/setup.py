@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app import bootstrap, database, migrate
-from app.seed import seed_all
-from app.services import scheduler
+from app import bootstrap, database
+from app.initializer import initialize_database
 
 router = APIRouter(prefix="/api/setup", tags=["setup"])
 
@@ -13,20 +12,7 @@ class DBConfig(BaseModel):
     port: int = 3306
     user: str
     password: str = ""
-    database: str
-
-
-def _initialize(cfg: dict) -> None:
-    """连接成功后：建引擎 → 建表 → 写入预置数据 → 启动定时任务。"""
-    database.init_engine(bootstrap.build_url(cfg))
-    database.Base.metadata.create_all(bind=database.engine)
-    migrate.run_migrations(database.engine)
-    db = database.SessionLocal()
-    try:
-        seed_all(db)
-    finally:
-        db.close()
-    scheduler.start_scheduler()
+    database: str = "easysub"
 
 
 @router.get("/status")
@@ -53,7 +39,7 @@ def save(cfg: DBConfig):
     if not ok:
         raise HTTPException(400, f"连接失败：{msg}")
     try:
-        _initialize(cfg.model_dump())
+        initialize_database(cfg.model_dump(), create_database=True)
     except Exception as e:  # noqa: BLE001
         database.reset_engine()
         raise HTTPException(500, f"初始化失败：{type(e).__name__}: {e}")

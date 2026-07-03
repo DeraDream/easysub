@@ -1,4 +1,5 @@
 import os
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -6,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app import bootstrap, database, migrate
+from app import bootstrap, database
+from app.config import settings
+from app.initializer import initialize_database
 from app.routers import (
     admin,
     auth,
@@ -25,31 +28,58 @@ from app.routers import (
     system,
     users,
 )
-from app.seed import seed_all
 from app.services import scheduler
+
+
+def _env_db_config() -> dict | None:
+    if not settings.easysub_db_host or not settings.easysub_db_user:
+        return None
+    return {
+        "host": settings.easysub_db_host,
+        "port": settings.easysub_db_port,
+        "user": settings.easysub_db_user,
+        "password": settings.easysub_db_password,
+        "database": settings.easysub_db_name,
+    }
+
+
+def _initialize_with_retry(cfg: dict, *, persist_config: bool) -> None:
+    last_error = None
+    for attempt in range(1, 31):
+        try:
+            initialize_database(cfg, create_database=True, persist_config=persist_config)
+            return
+        except Exception as e:  # noqa: BLE001
+            database.reset_engine()
+            last_error = e
+            if attempt < 30:
+                print(f"[startup] 数据库初始化等待中（{attempt}/30）：{e}")
+                time.sleep(2)
+    raise last_error
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 若磁盘上已有数据库配置，则尝试初始化；否则进入安装向导模式
+    # 若磁盘上已有数据库配置，则尝试初始化；否则可从环境变量自动初始化或进入安装向导模式
     if bootstrap.config_exists():
         try:
             cfg = bootstrap.load_config()
-            database.init_engine(bootstrap.build_url(cfg))
-            database.Base.metadata.create_all(bind=database.engine)
-            migrate.run_migrations(database.engine)
-            db = database.SessionLocal()
-            try:
-                seed_all(db)
-            finally:
-                db.close()
-            scheduler.start_scheduler()
+            initialize_database(cfg, create_database=False)
             print("[startup] 数据库已连接，系统就绪。")
         except Exception as e:  # noqa: BLE001
             database.reset_engine()
             print(f"[startup] 数据库初始化失败，进入安装向导模式：{e}")
     else:
-        print("[startup] 未检测到数据库配置，进入安装向导模式。")
+        cfg = _env_db_config()
+        if cfg:
+            try:
+                _initialize_with_retry(cfg, persist_config=True)
+                print("[startup] 已通过环境变量自动初始化数据库，系统就绪。")
+            except Exception as e:  # noqa: BLE001
+                database.reset_engine()
+                print(f"[startup] 环境变量自动初始化失败，进入安装向导模式：{e}")
+        else:
+            print("[startup] 未检测到数据库配置，进入安装向导模式。")
     yield
     scheduler.shutdown_scheduler()
 

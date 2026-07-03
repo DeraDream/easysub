@@ -44,8 +44,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            yforwardd71/easysub:latest
-            yforwardd71/easysub:${{ github.ref_name }}
+            yforward71/easysub:latest
+            yforward71/easysub:${{ github.ref_name }}
             ghcr.io/${{ github.repository_owner }}/easysub:latest
             ghcr.io/${{ github.repository_owner }}/easysub:${{ github.ref_name }}
           cache-from: type=gha

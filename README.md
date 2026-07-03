@@ -5,8 +5,8 @@
 **自托管的订阅 / 续费 / 保号管理系统 —— 用 Telegram 提醒你按时续费，再也不怕忘记导致掉号、过期。**
 
 [![License](https://img.shields.io/github/license/DeraDream/easysub?color=blue)](./LICENSE)
-[![Docker Pulls](https://img.shields.io/docker/pulls/yforwardd71/easysub?logo=docker)](https://hub.docker.com/r/yforwardd71/easysub)
-[![Docker Image Size](https://img.shields.io/docker/image-size/yforwardd71/easysub/latest?logo=docker)](https://hub.docker.com/r/yforwardd71/easysub)
+[![Docker Pulls](https://img.shields.io/docker/pulls/yforward71/easysub?logo=docker)](https://hub.docker.com/r/yforward71/easysub)
+[![Docker Image Size](https://img.shields.io/docker/image-size/yforward71/easysub/latest?logo=docker)](https://hub.docker.com/r/yforward71/easysub)
 [![GitHub Release](https://img.shields.io/github/v/release/DeraDream/easysub?logo=github)](https://github.com/DeraDream/easysub/releases)
 [![Stars](https://img.shields.io/github/stars/DeraDream/easysub?style=social)](https://github.com/DeraDream/easysub/stargazers)
 
@@ -71,7 +71,7 @@ docker run -d --name easysub \
   -e EASYSUB_DB_NAME=easysub \
   -v easysub_data:/app/data \
   --restart unless-stopped \
-  yforwardd71/easysub:latest
+  yforward71/easysub:latest
 ```
 
 > 国内拉取慢可改用 GHCR 镜像：`ghcr.io/deradream/easysub:latest`
@@ -198,11 +198,11 @@ docker run -d --name easysub -p 8842:8000 \
   -e JWT_SECRET="$(openssl rand -hex 32)" \
   -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
   -v easysub_data:/app/data --restart unless-stopped \
-  yforwardd71/easysub:latest
+  yforward71/easysub:latest
 ```
 
 Open `http://<host>:8842` and sign in after the compose stack auto-initializes MySQL. Build from source: `git clone https://github.com/DeraDream/easysub.git && cd easysub && cp .env.example .env && docker compose up -d --build`.
-NAS guides: [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) · Docker Hub: [yforwardd71/easysub](https://hub.docker.com/r/yforwardd71/easysub) · License MIT · TG [@Aiden_SU](https://t.me/Aiden_SU).
+NAS guides: [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) · Docker Hub: [yforward71/easysub](https://hub.docker.com/r/yforward71/easysub) · License MIT · TG [@Aiden_SU](https://t.me/Aiden_SU).
 
 ---
 
@@ -219,8 +219,8 @@ docker run -d --name easysub -p 8842:8000 \
   -e JWT_SECRET="$(openssl rand -hex 32)" \
   -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 \
   -v easysub_data:/app/data --restart unless-stopped \
-  yforwardd71/easysub:latest
+  yforward71/easysub:latest
 ```
 
 Откройте `http://<host>:8842` и войдите после автоматической инициализации MySQL в compose-стеке.
-Инструкции для NAS: [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) · Docker Hub: [yforwardd71/easysub](https://hub.docker.com/r/yforwardd71/easysub) · Лицензия MIT · TG [@Aiden_SU](https://t.me/Aiden_SU).
+Инструкции для NAS: [各厂家NAS安装教程.md](./各厂家NAS安装教程.md) · Docker Hub: [yforward71/easysub](https://hub.docker.com/r/yforward71/easysub) · Лицензия MIT · TG [@Aiden_SU](https://t.me/Aiden_SU).

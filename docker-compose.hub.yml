@@ -7,7 +7,7 @@
 services:
   app:
     # 国内拉取慢可改用 GHCR：ghcr.io/deradream/easysub:latest
-    image: yforwardd71/easysub:latest
+    image: yforward71/easysub:latest
     container_name: easysub
     restart: unless-stopped
     environment:

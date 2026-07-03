@@ -25,7 +25,7 @@ Then open `http://<host>:8842` and log in with the admin account from the enviro
 ```yaml
 services:
   app:
-    image: yforwardd71/easysub:latest
+    image: yforward71/easysub:latest
     container_name: easysub
     restart: unless-stopped
     environment:

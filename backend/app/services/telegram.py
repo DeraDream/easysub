@@ -31,6 +31,15 @@ def get_me(token: str, api_base: str | None = None, proxy: str | None = None) ->
         return resp.json()
 
 
+def main_keyboard() -> dict:
+    """Telegram 底部常驻键盘。"""
+    return {
+        "keyboard": [["服务状态", "订阅列表", "编辑订阅"]],
+        "resize_keyboard": True,
+        "is_persistent": True,
+    }
+
+
 def send_message(
     chat_id: str,
     text: str,
@@ -38,23 +47,35 @@ def send_message(
     api_base: str | None = None,
     proxy: str | None = None,
     parse_mode: str = "Markdown",
+    reply_markup: dict | None = None,
 ) -> dict:
     if not token:
         raise RuntimeError("未配置 Bot Token")
     with _client(proxy) as c:
+        payload = {"chat_id": chat_id, "text": text, "parse_mode": parse_mode}
+        if reply_markup:
+            payload["reply_markup"] = reply_markup
         resp = c.post(
             _url(api_base, token, "sendMessage"),
-            json={"chat_id": chat_id, "text": text, "parse_mode": parse_mode},
+            json=payload,
         )
         resp.raise_for_status()
         return resp.json()
 
 
-def get_updates(token: str, api_base: str | None = None, proxy: str | None = None) -> dict:
+def get_updates(
+    token: str,
+    api_base: str | None = None,
+    proxy: str | None = None,
+    offset: int | None = None,
+) -> dict:
     """辅助绑定：用户向 Bot 发消息后，从这里读取 chat_id。"""
     if not token:
         raise RuntimeError("未配置 Bot Token")
     with _client(proxy) as c:
-        resp = c.get(_url(api_base, token, "getUpdates"))
+        params = {}
+        if offset is not None:
+            params["offset"] = offset
+        resp = c.get(_url(api_base, token, "getUpdates"), params=params)
         resp.raise_for_status()
         return resp.json()

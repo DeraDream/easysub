@@ -61,10 +61,12 @@ def telegram_test(
             "✅ *连接成功！*\n\n"
             "省心订阅 *EasySub* 已和你的 Telegram 绑定～\n"
             "之后有订阅快到期，我会带上完整信息提前提醒你，"
-            "保号 / 续费再也不怕忘记啦 🎉",
+            "保号 / 续费再也不怕忘记啦 🎉\n\n"
+            "底部按钮已启用：服务状态、订阅列表、编辑订阅。",
             token=token,
             api_base=user.telegram_api_base,
             proxy=user.telegram_proxy,
+            reply_markup=telegram.main_keyboard(),
         )
     except Exception as e:  # noqa: BLE001
         activity.log("telegram.test", f"测试消息发送失败：{e}", user=user, level="error")

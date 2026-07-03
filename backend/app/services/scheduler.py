@@ -8,7 +8,7 @@ from sqlalchemy import select
 from app import activity, database
 from app.config import settings
 from app.models import Category, NotificationLog, PaymentMethod, Subscription, User
-from app.services import exchange, telegram
+from app.services import exchange, telegram, telegram_bot
 
 _scheduler: BackgroundScheduler | None = None
 
@@ -73,6 +73,7 @@ def run_reminder_scan() -> dict:
                             token=user.telegram_bot_token,
                             api_base=user.telegram_api_base,
                             proxy=user.telegram_proxy,
+                            reply_markup=telegram.main_keyboard(),
                         )
                         log.message = text
                         sent += 1
@@ -182,6 +183,15 @@ def start_scheduler() -> None:
         CronTrigger(hour=4, minute=0),
         id="daily_rate_refresh",
         replace_existing=True,
+    )
+    # 轮询 Telegram 底部按钮消息
+    _scheduler.add_job(
+        telegram_bot.run_bot_poll,
+        "interval",
+        seconds=30,
+        id="telegram_bot_poll",
+        replace_existing=True,
+        max_instances=1,
     )
     _scheduler.start()
 

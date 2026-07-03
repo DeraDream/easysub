@@ -46,7 +46,7 @@ jobs:
           tags: |
             yforward71/easysub:latest
             yforward71/easysub:${{ github.ref_name }}
-            ghcr.io/${{ github.repository_owner }}/easysub:latest
-            ghcr.io/${{ github.repository_owner }}/easysub:${{ github.ref_name }}
+            ghcr.io/deradream/easysub:latest
+            ghcr.io/deradream/easysub:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

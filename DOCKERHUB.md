@@ -4,9 +4,9 @@ Self-hosted subscription / renewal manager with **Telegram reminders** so you ne
 
 自托管的订阅 / 续费 / 保号管理系统，通过 **Telegram** 提醒续费，防止忘记导致过期。
 
-- **Source / 源码**: https://github.com/suyijun8182/easysub
+- **Source / 源码**: https://github.com/DeraDream/easysub
 - **Tags**: `latest`, `v*` (per release) — multi-arch `linux/amd64` + `linux/arm64`
-- **GHCR mirror**: `ghcr.io/suyijun8182/easysub:latest`
+- **GHCR mirror**: `ghcr.io/deradream/easysub:latest`
 
 > Use the compose file for a ready-to-run stack with MySQL 8. EasySub can also auto-initialize an external MySQL server through `EASYSUB_DB_*` environment variables.
 > 推荐使用 compose 文件一键启动 EasySub + MySQL 8。也可通过 `EASYSUB_DB_*` 环境变量自动初始化外部 MySQL。
@@ -14,7 +14,7 @@ Self-hosted subscription / renewal manager with **Telegram reminders** so you ne
 ## Quick start / 快速开始
 
 ```bash
-curl -O https://raw.githubusercontent.com/suyijun8182/easysub/main/docker-compose.hub.yml
+curl -O https://raw.githubusercontent.com/DeraDream/easysub/main/docker-compose.hub.yml
 docker compose -f docker-compose.hub.yml up -d
 ```
 
@@ -25,7 +25,7 @@ Then open `http://<host>:8842` and log in with the admin account from the enviro
 ```yaml
 services:
   app:
-    image: suyijun8182/easysub:latest
+    image: yforwardd71/easysub:latest
     container_name: easysub
     restart: unless-stopped
     environment:
@@ -88,7 +88,7 @@ Multi-user (JWT, admin/user roles) · recurring & one-time subscriptions · mult
 
 ## NAS install guides
 
-Synology / QNAP / fnOS / Unraid / TrueNAS — see [各厂家NAS安装教程.md](https://github.com/suyijun8182/easysub/blob/main/%E5%90%84%E5%8E%82%E5%AE%B6NAS%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md) in the repo.
+Synology / QNAP / fnOS / Unraid / TrueNAS — see [各厂家NAS安装教程.md](https://github.com/DeraDream/easysub/blob/main/%E5%90%84%E5%8E%82%E5%AE%B6NAS%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B.md) in the repo.
 
 ## License
 

@@ -6,8 +6,8 @@
 # NAS（群晖/威联通/飞牛/Unraid 等）图形界面也可直接粘贴本文件内容创建项目。
 services:
   app:
-    # 国内拉取慢可改用 GHCR：ghcr.io/suyijun8182/easysub:latest
-    image: suyijun8182/easysub:latest
+    # 国内拉取慢可改用 GHCR：ghcr.io/deradream/easysub:latest
+    image: yforwardd71/easysub:latest
     container_name: easysub
     restart: unless-stopped
     environment:

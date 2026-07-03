@@ -44,8 +44,8 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            suyijun8182/easysub:latest
-            suyijun8182/easysub:${{ github.ref_name }}
+            yforwardd71/easysub:latest
+            yforwardd71/easysub:${{ github.ref_name }}
             ghcr.io/${{ github.repository_owner }}/easysub:latest
             ghcr.io/${{ github.repository_owner }}/easysub:${{ github.ref_name }}
           cache-from: type=gha

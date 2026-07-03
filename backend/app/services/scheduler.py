@@ -188,7 +188,7 @@ def start_scheduler() -> None:
     _scheduler.add_job(
         telegram_bot.run_bot_poll,
         "interval",
-        seconds=30,
+        seconds=5,
         id="telegram_bot_poll",
         replace_existing=True,
         max_instances=1,

@@ -33,7 +33,6 @@ def run_bot_poll() -> None:
     try:
         users = db.scalars(
             select(User).where(
-                User.telegram_enabled.is_(True),
                 User.telegram_bot_token.is_not(None),
                 User.telegram_chat_id.is_not(None),
             )
@@ -90,7 +89,10 @@ def run_bot_poll() -> None:
                 text = (msg.get("text") or "").strip()
                 chat_id = str(chat.get("id") or "")
                 user = users_by_chat.get(chat_id)
-                if not user or not text:
+                if not text:
+                    continue
+                if not user:
+                    print(f"[telegram-bot] ignored message from unbound chat {chat_id}: {text}")
                     continue
                 if first_poll:
                     print(f"[telegram-bot] processing recent message from chat {chat_id}: {text}")
